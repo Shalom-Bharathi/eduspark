@@ -816,94 +816,36 @@
         }
 
         function showScholarships(scholarships, container) {
-          if (!Array.isArray(scholarships) || scholarships.length === 0) {
-            container.innerHTML = "<p>No scholarship data available</p>";
+          if (
+            !scholarships ||
+            !Array.isArray(scholarships) ||
+            scholarships.length === 0
+          ) {
+            container.innerHTML =
+              "<p class='no-data'>No scholarship data available</p>";
             return;
           }
 
-          // Create Scholarships Graph
-          const chartContainer = document.createElement("div");
-          chartContainer.className = "chart-container";
-          chartContainer.style.cssText =
-            "height: 500px; width: 90%; margin: 0 auto 2rem auto;";
-          container.appendChild(chartContainer);
+          const scholarshipsContainer = document.createElement("div");
+          scholarshipsContainer.className = "scholarships-container";
+          container.appendChild(scholarshipsContainer);
 
-          const scholarshipNames = scholarships.map(
-            (scholarship) => scholarship.name
-          );
-          const scholarshipAmounts = scholarships.map((scholarship) =>
-            parseFloat(scholarship.amount.replace(/[^0-9.-]+/g, ""))
-          );
-
-          const colorPalette = [
-            "#FF6384",
-            "#36A2EB",
-            "#FFCE56",
-            "#4BC0C0",
-            "#9966FF",
-            "#FF9F40",
-          ];
-
-          // Ensure the chart is rendered after the DOM is fully loaded
-          const options = {
-            chart: { type: "bar", height: 350 },
-            series: [{ name: "Scholarship Amount", data: scholarshipAmounts }],
-            xaxis: { categories: scholarshipNames },
-            colors: colorPalette,
-            title: {
-              text: "Scholarship Amounts",
-              align: "center",
-              style: { fontSize: "20px", fontWeight: "bold" },
-            },
-            tooltip: {
-              y: {
-                formatter: (val) => "$" + val.toLocaleString(),
-              },
-            },
-            dataLabels: { enabled: true },
-          };
-
-          const chart = new ApexCharts(chartContainer, options);
-          chart.render();
-
-          // Add eligibility information below the chart
-          const eligibilityContainer = document.createElement("div");
-          eligibilityContainer.className = "eligibility-container mt-8";
-          scholarships.forEach((scholarship, index) => {
-            const eligibilityItem = document.createElement("div");
-            eligibilityItem.className =
-              "eligibility-item mb-4 p-4 bg-white rounded-lg shadow transition-all duration-300 hover:shadow-lg";
-            eligibilityItem.innerHTML = `
-              <h3 class="text-lg font-semibold mb-2" style="color: ${
-                colorPalette[index % colorPalette.length]
-              }">${scholarship.name}</h3>
-              <p class="text-gray-700"><strong>Amount:</strong> ${
-                scholarship.amount
-              }</p>
-              <p class="text-gray-700"><strong>Eligibility:</strong> ${
-                scholarship.eligibility
-              }</p>
+          scholarships.forEach((scholarship, idx) => {
+            const card = document.createElement("div");
+            card.className = "scholarship-card";
+            card.innerHTML = `
+                <div class="card-content" style="background: #C1CFA1; border-radius: 8px; padding: 20px; margin: 10px 0; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); transition: transform 0.3s;">
+                    <h3 style="color: #333; font-size: 1.5em; margin-bottom: 10px;">${scholarship.name}</h3>
+                    <p style="font-weight: bold; color: #2c3e50;">Amount: <span style="color: #e74c3c;">${scholarship.amount}</span></p>
+                    <p><strong>Eligibility:</strong> ${scholarship.eligibility}</p>
+                </div>
             `;
-            eligibilityContainer.appendChild(eligibilityItem);
+            scholarshipsContainer.appendChild(card);
+
             setTimeout(() => {
-              eligibilityItem.style.opacity = "1";
-              eligibilityItem.style.transform = "translateY(0)";
-            }, 100 * index);
-          });
-          container.appendChild(eligibilityContainer);
-
-          const header = document.createElement("h2");
-          header.className =
-            "text-3xl font-bold text-center mb-8 text-gray-800";
-          header.textContent = "Available Scholarships";
-          container.insertBefore(header, chartContainer);
-
-          // Add some styling to the container
-          Object.assign(container.style, {
-            backgroundColor: "#f8f9fa",
-            padding: "2rem",
-            borderRadius: "10px",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+              card.classList.add("show");
+              card.style.transform = "translateY(0)";
+            }, 100 * idx);
           });
         }
 
@@ -946,7 +888,6 @@
           container.appendChild(specializationsContainer);
         }
 
-        // Utility function to map tag colors based on text
         function mapTagColor(text) {
           if (!text || typeof text !== "string") {
             return "gray";
