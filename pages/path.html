@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>EDUspark</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/framer-motion@4.1.17/dist/framer-motion.umd.min.js"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <link rel="stylesheet" href="../styles/global.css" />
+    <style>
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateY(50px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .content-section {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: white;
+        z-index: 1000;
+        overflow-y: auto;
+        padding: 2rem;
+      }
+
+      .content-section.active {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        animation: fadeIn 0.5s ease-out;
+      }
+
+      .chart-container {
+        width: 100%;
+        max-width: 800px;
+        height: 400px;
+        margin: 2rem 0;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+      }
+
+      .chart-container.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .hero-section {
+        position: relative;
+        height: 400px;
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        color: white;
+      }
+
+      .modern-table {
+        width: 100%;
+        max-width: 800px;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 8px;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+      }
+
+      .modern-table.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .modern-table th {
+        background-color: #4a5568;
+        color: white;
+        font-weight: bold;
+        padding: 12px;
+        text-align: left;
+      }
+
+      .modern-table td {
+        background-color: #f8f8f8;
+        padding: 12px;
+      }
+
+      .modern-table tr:nth-child(even) td {
+        background-color: #f0f0f0;
+      }
+
+      .modern-table tr:hover td {
+        background-color: #e8e8e8;
+      }
+
+      .tag {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .tag-blue {
+        background-color: #ebf8ff;
+        color: #2b6cb0;
+      }
+      .tag-green {
+        background-color: #f0fff4;
+        color: #2f855a;
+      }
+      .tag-red {
+        background-color: #fff5f5;
+        color: #c53030;
+      }
+
+      .college-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 1200px;
+      }
+
+      .college-category {
+        width: 32%;
+        margin-bottom: 2rem;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+      }
+
+      .college-category.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .college-card {
+        background-color: #f8f8f8;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 1rem;
+        margin-bottom: 1rem;
+        width: 100%;
+        transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+      }
+
+      .college-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .college-card h3 {
+        font-size: 1.25rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+
+      .master-card {
+        background-color: #f8f8f8;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        max-width: 800px;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.5s ease-out, transform 0.5s ease-out,
+          box-shadow 0.3s ease-out;
+      }
+
+      .master-card.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .master-card:hover {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .master-card-icon {
+        font-size: 2rem;
+        margin-right: 1rem;
+      }
+
+      .master-card-content {
+        flex: 1;
+      }
+
+      .master-card h3 {
+        font-size: 1.25rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+
+      .heatmap {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+        width: 100%;
+        max-width: 800px;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+      }
+
+      .heatmap.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .heatmap-cell {
+        padding: 10px;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        text-align: center;
+        transition: transform 0.3s ease-out;
+      }
+
+      .heatmap-cell:hover {
+        transform: scale(1.05);
+      }
+
+      .close-button {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 1.5rem;
+        color: #4a5568;
+        cursor: pointer;
+        transition: color 0.3s ease-out;
+      }
+
+      .close-button:hover {
+        color: #2d3748;
+      }
+    </style>
+  </head>
+  <body class="flex flex-col min-h-screen bg-gray-100">
+    <header
+      class="px-4 lg:px-6 h-16 flex items-center bg-white border-b border-slate-200 sticky top-0 z-50"
+    >
+      <a class="flex items-center justify-center" href="../index.html">
+        <i class="fas fa-book-open text-2xl text-black"></i>
+        <span class="ml-2 text-2xl font-bold text-black">EDUspark</span>
+      </a>
+      <nav class="ml-auto flex gap-4 sm:gap-6">
+        <a
+          class="text-sm font-medium text-slate-700 hover:text-emerald-600 transition-colors"
+          href="#features"
+          >Features</a
+        >
+        <a
+          class="text-sm font-medium text-slate-700 hover:text-emerald-600 transition-colors"
+          href="#about"
+          >About</a
+        >
+        <a
+          class="text-sm font-medium text-slate-700 hover:text-emerald-600 transition-colors"
+          href="#contact"
+          >Contact</a
+        >
+      </nav>
+    </header>
+
+    <div id="heroSection" class="hero-section">
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <h1
+          id="heroTitle"
+          class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4"
+        ></h1>
+        <p id="heroDescription" class="text-xl md:text-2xl mb-8"></p>
+        <a
+          id="heroButton"
+          href="#"
+          class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-full transition-colors duration-300"
+        ></a>
+      </div>
+    </div>
+
+    <div
+      id="optionsContainer"
+      class="container mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+    ></div>
+    <div id="contentDisplay" class="content-section"></div>
+
+    <script src="../scripts/index.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const selectedDatabase = JSON.parse(
+          localStorage.getItem("selectedDatabase")
+        );
+
+        if (!selectedDatabase) {
+          console.error("Selected database not found in localStorage");
+          return;
+        }
+
+        const heroSection = document.getElementById("heroSection");
+        const heroTitle = document.getElementById("heroTitle");
+        const heroDescription = document.getElementById("heroDescription");
+        const heroButton = document.getElementById("heroButton");
+
+        heroSection.style.backgroundImage = `url('${selectedDatabase.heroSection.backgroundImage}')`;
+        heroTitle.textContent = selectedDatabase.heroSection.title;
+        heroDescription.textContent = selectedDatabase.heroSection.description;
+        heroButton.textContent = selectedDatabase.heroSection.buttonText;
+
+        const optionsContainer = document.getElementById("optionsContainer");
+        if (!optionsContainer) {
+          console.error("Options container element not found");
+          return;
+        }
+
+        selectedDatabase.options.forEach((option, index) => {
+          const card = document.createElement("div");
+          card.className =
+            "bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 p-6 hover-grow fade-in";
+          card.style.animationDelay = `${index * 0.1}s`;
+
+          let iconClass;
+          switch (option.name) {
+            case "Job Opportunities":
+              iconClass = "fas fa-briefcase";
+              break;
+            case "Colleges":
+              iconClass = "fas fa-university";
+              break;
+            case "Entrance Exams":
+              iconClass = "fas fa-file-alt";
+              break;
+            case "Master Courses":
+              iconClass = "fas fa-graduation-cap";
+              break;
+            case "Scholarships":
+              iconClass = "fas fa-award";
+              break;
+            case "Groups after 10th":
+              iconClass = "fas fa-users";
+              break;
+            case "Specializations":
+              iconClass = "fas fa-microscope";
+              break;
+            default:
+              iconClass = "fas fa-globe";
+          }
+
+          card.innerHTML = `
+                <div class="flex items-center mb-4">
+                    <i class="${iconClass} text-2xl text-emerald-600 mr-3"></i>
+                    <h2 class="text-xl font-semibold animate-color">${option.name}</h2>
+                </div>
+                <p class="text-gray-600 mb-4">${option.description}</p>
+                <button style="background-color: #629584" onclick="showContent('${option.name}')" class="w-full bg-emerald-600 text-white py-2 px-4 rounded hover:bg-emerald-700 transition-colors hover-text-animation">
+                    Explore ${option.name}
+                </button>
+          `;
+          optionsContainer.appendChild(card);
+        });
+
+        window.showContent = function (optionName) {
+          const option = selectedDatabase.options.find(
+            (opt) => opt.name === optionName
+          );
+          if (!option) {
+            console.error(`Option ${optionName} not found`);
+            return;
+          }
+
+          const contentDisplay = document.getElementById("contentDisplay");
+          contentDisplay.innerHTML = "";
+
+          const closeButton = document.createElement("div");
+          closeButton.className = "close-button";
+          closeButton.innerHTML = '<i class="fas fa-times"></i>';
+          closeButton.addEventListener("click", () => {
+            contentDisplay.classList.remove("active");
+            gsap.to(contentDisplay, {
+              opacity: 0,
+              y: 50,
+              duration: 0.5,
+              onComplete: () => {
+                contentDisplay.style.display = "none";
+              },
+            });
+          });
+          contentDisplay.appendChild(closeButton);
+
+          const title = document.createElement("h2");
+          title.className = "text-4xl font-bold mb-6 text-center";
+          title.textContent = option.name;
+          contentDisplay.appendChild(title);
+
+          const contentContainer = document.createElement("div");
+          contentContainer.className = "flex flex-col items-center w-full";
+
+          switch (option.name) {
+            case "Job Opportunities":
+              showJobOpportunities(option.content, contentContainer);
+              break;
+            case "Colleges":
+              showColleges(option.content, contentContainer);
+              break;
+            case "Entrance Exams":
+              showEntranceExams(option.content, contentContainer);
+              break;
+            case "Master Courses":
+              showMasterCourses(option.content, contentContainer);
+              break;
+            case "Scholarships":
+              showScholarships(option.content, contentContainer);
+              break;
+            case "Groups after 10th":
+              showGroupsAfter10th(option.content, contentContainer);
+              break;
+            case "Specializations":
+              showSpecializations(option.content, contentContainer);
+              break;
+            default:
+              contentContainer.innerHTML = "<p>Content not available</p>";
+          }
+
+          contentDisplay.appendChild(contentContainer);
+          contentDisplay.classList.add("active");
+          contentDisplay.style.display = "block";
+          gsap.fromTo(
+            contentDisplay,
+            { opacity: 0, y: 50 },
+            { opacity: 1, y: 0, duration: 0.5 }
+          );
+        };
+
+        function showJobOpportunities(jobContent, container) {
+          if (
+            !jobContent ||
+            !Array.isArray(jobContent) ||
+            jobContent.length === 0
+          ) {
+            container.innerHTML = "<p>No job opportunities data available</p>";
+            return;
+          }
+
+          // Create Job Opportunities Graph
+          const chartContainer = document.createElement("div");
+          chartContainer.className = "chart-container";
+          chartContainer.style.height = "500px";
+          chartContainer.style.width = "90%";
+          chartContainer.style.margin = "0 auto 2rem auto";
+          container.appendChild(chartContainer);
+
+          const ctx = document.createElement("canvas");
+          ctx.id = "jobOpportunitiesChart";
+          chartContainer.appendChild(ctx);
+
+          const roles = jobContent.map((job) => job.role);
+          const currentYear = new Date().getFullYear();
+          const years = [
+            currentYear - 4,
+            currentYear - 3,
+            currentYear - 2,
+            currentYear - 1,
+            currentYear,
+          ];
+
+          // Generate dummy growth data
+          const growthData = jobContent.map((job) => {
+            const finalGrowth = parseFloat(job.growth.replace("%", ""));
+            return years.map((year, index) => {
+              if (index === years.length - 1) return finalGrowth;
+              return Math.max(
+                0,
+                finalGrowth - Math.random() * 5 * (years.length - index - 1)
+              );
+            });
+          });
+
+          const colorPalette = [
+            "rgba(255, 99, 132, 1)",
+            "rgba(54, 162, 235, 1)",
+            "rgba(255, 206, 86, 1)",
+            "rgba(75, 192, 192, 1)",
+            "rgba(153, 102, 255, 1)",
+            "rgba(255, 159, 64, 1)",
+          ];
+
+          const datasets = roles.map((role, index) => ({
+            label: role,
+            data: growthData[index],
+            borderColor: colorPalette[index % colorPalette.length],
+            backgroundColor: colorPalette[index % colorPalette.length].replace(
+              "1)",
+              "0.2)"
+            ),
+            borderWidth: 3,
+            pointBackgroundColor: colorPalette[index % colorPalette.length],
+            pointRadius: 5,
+            pointHoverRadius: 8,
+            fill: false,
+            tension: 0.4,
+          }));
+
+          new Chart(ctx, {
+            type: "line",
+            data: {
+              labels: years,
+              datasets: datasets,
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                x: {
+                  grid: {
+                    color: "rgba(0, 0, 0, 0.1)",
+                  },
+                  ticks: {
+                    font: {
+                      size: 12,
+                      weight: "bold",
+                    },
+                  },
+                },
+                y: {
+                  beginAtZero: true,
+                  max: Math.max(...growthData.flat()) + 5,
+                  ticks: {
+                    callback: function (value) {
+                      return value + "%";
+                    },
+                    font: {
+                      size: 12,
+                      weight: "bold",
+                    },
+                  },
+                  grid: {
+                    color: "rgba(0, 0, 0, 0.1)",
+                  },
+                },
+              },
+              plugins: {
+                tooltip: {
+                  mode: "index",
+                  intersect: false,
+                  backgroundColor: "rgba(0, 0, 0, 0.7)",
+                  titleFont: {
+                    size: 14,
+                    weight: "bold",
+                  },
+                  bodyFont: {
+                    size: 13,
+                  },
+                  borderColor: "#fff",
+                  borderWidth: 1,
+                  callbacks: {
+                    label: function (context) {
+                      let label = context.dataset.label || "";
+                      if (label) {
+                        label += ": ";
+                      }
+                      if (context.parsed.y !== null) {
+                        label += context.parsed.y.toFixed(2) + "%";
+                      }
+                      return label;
+                    },
+                  },
+                },
+                legend: {
+                  display: true,
+                  position: "bottom",
+                  labels: {
+                    font: {
+                      size: 12,
+                      weight: "bold",
+                    },
+                    boxWidth: 20,
+                    padding: 20,
+                  },
+                },
+                title: {
+                  display: true,
+                  text: "Job Growth Rate Comparison Over Years",
+                  font: {
+                    size: 20,
+                    weight: "bold",
+                  },
+                  padding: {
+                    top: 10,
+                    bottom: 30,
+                  },
+                  color: "#333",
+                },
+              },
+              animation: {
+                duration: 2000,
+                easing: "easeOutQuart",
+              },
+              hover: {
+                mode: "nearest",
+                intersect: true,
+              },
+            },
+          });
+
+          setTimeout(() => {
+            chartContainer.classList.add("show");
+          }, 300);
+
+          const infoText = document.createElement("p");
+          infoText.className = "mt-4 text-center text-gray-600 text-lg";
+          infoText.textContent =
+            "The line chart above illustrates the growth trends for different job roles over the past 5 years, with the current year's growth rate matching the provided data.";
+          container.appendChild(infoText);
+
+          const table = document.createElement("table");
+          table.className = "modern-table mt-8 w-full";
+          table.innerHTML = `
+                <thead>
+                  <tr>
+                    <th class="px-4 py-2">Role</th>
+                    <th class="px-4 py-2">Avg. Salary</th>
+                    <th class="px-4 py-2">Current Growth</th>
+                    <th class="px-4 py-2">Skills</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${jobContent
+                    .map(
+                      (role, index) => `
+                    <tr class="hover:bg-gray-100 transition-colors duration-200">
+                      <td class="px-4 py-2">
+                        <span class="icon mr-2" style="color: ${
+                          colorPalette[index % colorPalette.length]
+                        }">
+                          <i class="${role.icon}"></i>
+                        </span>
+                        ${role.role}
+                      </td>
+                      <td class="px-4 py-2">${role.avgSalary}</td>
+                      <td class="px-4 py-2">${role.growth}</td>
+                      <td class="px-4 py-2">${
+                        Array.isArray(role.skills)
+                          ? role.skills
+                              .map(
+                                (skill) =>
+                                  `<span class="tag tag-blue">${skill}</span>`
+                              )
+                              .join(" ")
+                          : "-"
+                      }</td>
+                    </tr>
+                  `
+                    )
+                    .join("")}
+                </tbody>
+              `;
+          container.appendChild(table);
+          setTimeout(() => {
+            table.classList.add("show");
+          }, 300);
+        }
+
+        function showColleges(collegeContent, container) {
+          if (!collegeContent || Object.keys(collegeContent).length === 0) {
+            container.innerHTML = "<p>No college data available</p>";
+            return;
+          }
+
+          const collegeContainer = document.createElement("div");
+          collegeContainer.className = "college-container";
+
+          const categories = Object.keys(collegeContent);
+          categories.forEach((category) => {
+            const categoryDiv = document.createElement("div");
+            categoryDiv.className = "college-category";
+            categoryDiv.innerHTML = `<h3 class="text-2xl font-bold mb-4">${category}</h3>`;
+
+            collegeContent[category].forEach((college) => {
+              const collegeCard = document.createElement("div");
+              collegeCard.className = "college-card";
+              collegeCard.innerHTML = `
+                    <h3>${college.name}</h3>
+                    <p>Location: ${college.location}</p>
+                    <p>Ranking: #${college.ranking}</p>
+                    <p>Specialization: ${college.specialization}</p>
+                  `;
+              categoryDiv.appendChild(collegeCard);
+            });
+
+            collegeContainer.appendChild(categoryDiv);
+            // Add show class for animation
+            setTimeout(() => {
+              categoryDiv.classList.add("show");
+            }, 100);
+          });
+
+          container.appendChild(collegeContainer);
+        }
+
+        function showEntranceExams(examContent, container) {
+          if (
+            !examContent ||
+            !Array.isArray(examContent) ||
+            examContent.length === 0
+          ) {
+            container.innerHTML = "<p>No entrance exam data available</p>";
+            return;
+          }
+
+          const table = document.createElement("table");
+          table.className = "modern-table";
+          table.innerHTML = `
+                <thead>
+                  <tr>
+                    <th>Exam Name</th>
+                    <th>Type</th>
+                    <th>Subjects</th>
+                    <th>Difficulty</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${examContent
+                    .map(
+                      (exam) => `
+                    <tr>
+                      <td>${exam.name}</td>
+                      <td><span class="tag tag-${mapTagColor(exam.type)}">${
+                        exam.type
+                      }</span></td>
+                      <td>${exam.subjects}</td>
+                      <td><span class="tag tag-${mapTagColor(
+                        exam.difficulty
+                      )}">${exam.difficulty}</span></td>
+                    </tr>
+                  `
+                    )
+                    .join("")}
+                </tbody>
+              `;
+          container.appendChild(table);
+          setTimeout(() => {
+            table.classList.add("show");
+          }, 100);
+        }
+
+        function showMasterCourses(courses, container) {
+          if (!courses || !Array.isArray(courses) || courses.length === 0) {
+            container.innerHTML = "<p>No master courses data available</p>";
+            return;
+          }
+
+          courses.forEach((course, idx) => {
+            const card = document.createElement("div");
+            card.className = "master-card";
+            card.innerHTML = `
+                  <div class="master-card-content">
+                    <h3>${course.name}</h3>
+                    <p>Duration: ${course.duration}</p>
+                    <p>Focus: ${course.focus}</p>
+                  </div>
+                `;
+            container.appendChild(card);
+            // Add show class with staggered delay
+            setTimeout(() => {
+              card.classList.add("show");
+            }, 100 * idx);
+          });
+        }
+
+        function showScholarships(scholarships, container) {
+          if (!Array.isArray(scholarships) || scholarships.length === 0) {
+            container.innerHTML = "<p>No scholarship data available</p>";
+            return;
+          }
+
+          // Create Scholarships Graph
+          const chartContainer = document.createElement("div");
+          chartContainer.className = "chart-container";
+          chartContainer.style.cssText =
+            "height: 500px; width: 90%; margin: 0 auto 2rem auto;";
+          container.appendChild(chartContainer);
+
+          const scholarshipNames = scholarships.map(
+            (scholarship) => scholarship.name
+          );
+          const scholarshipAmounts = scholarships.map((scholarship) =>
+            parseFloat(scholarship.amount.replace(/[^0-9.-]+/g, ""))
+          );
+
+          const colorPalette = [
+            "#FF6384",
+            "#36A2EB",
+            "#FFCE56",
+            "#4BC0C0",
+            "#9966FF",
+            "#FF9F40",
+          ];
+
+          // Ensure the chart is rendered after the DOM is fully loaded
+          const options = {
+            chart: { type: "bar", height: 350 },
+            series: [{ name: "Scholarship Amount", data: scholarshipAmounts }],
+            xaxis: { categories: scholarshipNames },
+            colors: colorPalette,
+            title: {
+              text: "Scholarship Amounts",
+              align: "center",
+              style: { fontSize: "20px", fontWeight: "bold" },
+            },
+            tooltip: {
+              y: {
+                formatter: (val) => "$" + val.toLocaleString(),
+              },
+            },
+            dataLabels: { enabled: true },
+          };
+
+          const chart = new ApexCharts(chartContainer, options);
+          chart.render();
+
+          // Add eligibility information below the chart
+          const eligibilityContainer = document.createElement("div");
+          eligibilityContainer.className = "eligibility-container mt-8";
+          scholarships.forEach((scholarship, index) => {
+            const eligibilityItem = document.createElement("div");
+            eligibilityItem.className =
+              "eligibility-item mb-4 p-4 bg-white rounded-lg shadow transition-all duration-300 hover:shadow-lg";
+            eligibilityItem.innerHTML = `
+              <h3 class="text-lg font-semibold mb-2" style="color: ${
+                colorPalette[index % colorPalette.length]
+              }">${scholarship.name}</h3>
+              <p class="text-gray-700"><strong>Amount:</strong> ${
+                scholarship.amount
+              }</p>
+              <p class="text-gray-700"><strong>Eligibility:</strong> ${
+                scholarship.eligibility
+              }</p>
+            `;
+            eligibilityContainer.appendChild(eligibilityItem);
+            setTimeout(() => {
+              eligibilityItem.style.opacity = "1";
+              eligibilityItem.style.transform = "translateY(0)";
+            }, 100 * index);
+          });
+          container.appendChild(eligibilityContainer);
+
+          const header = document.createElement("h2");
+          header.className =
+            "text-3xl font-bold text-center mb-8 text-gray-800";
+          header.textContent = "Available Scholarships";
+          container.insertBefore(header, chartContainer);
+
+          // Add some styling to the container
+          Object.assign(container.style, {
+            backgroundColor: "#f8f9fa",
+            padding: "2rem",
+            borderRadius: "10px",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+          });
+        }
+
+        function showSpecializations(specializations, container) {
+          if (
+            !specializations ||
+            !Array.isArray(specializations) ||
+            specializations.length === 0
+          ) {
+            container.innerHTML = "<p>No specializations data available</p>";
+            return;
+          }
+
+          const specializationsContainer = document.createElement("div");
+          specializationsContainer.className = "specializations-container";
+
+          specializations.forEach((specialization, idx) => {
+            const specializationCard = document.createElement("div");
+            specializationCard.className = "specialization-card";
+            specializationCard.innerHTML = `
+            <div style="background-color: #f0f0f0; margin-bottom: 10px;" class=" rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 p-6 hover-grow fade-in">
+              <h3 class="text-xl font-bold mb-2">
+                <i class="fas fa-fire" style="color: transparent; background-image: linear-gradient(to right, #d63230, #f39237); -webkit-background-clip: text; background-clip: text;"></i> 
+                ${specialization.name}</h3>
+              <p class="mb-2"><strong>Duration:</strong> ${
+                specialization.duration || "N/A"
+              }</p>
+              <p class="mb-2"><strong>Focus:</strong> ${
+                specialization.focus || "N/A"
+              }</p>
+            </div>
+            `;
+            specializationsContainer.appendChild(specializationCard);
+
+            setTimeout(() => {
+              specializationCard.classList.add("show");
+            }, 100 * idx);
+          });
+
+          container.appendChild(specializationsContainer);
+        }
+
+        // Utility function to map tag colors based on text
+        function mapTagColor(text) {
+          if (!text || typeof text !== "string") {
+            return "gray";
+          }
+          switch (text.toLowerCase()) {
+            case "national":
+              return "blue";
+            case "state":
+              return "green";
+            case "university":
+              return "red";
+            case "high":
+              return "red";
+            case "medium":
+              return "green";
+            case "varies":
+              return "blue";
+            default:
+              return "gray";
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
+`

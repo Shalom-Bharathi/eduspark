@@ -1,0 +1,444 @@
+let database;
+      function initializePage() {
+        database = computerScienceDatabase;
+        setupHeroSection();
+        setupOptions();
+        setupExploreButton();
+      }
+
+      function setupHeroSection() {
+        const { backgroundImage, title, description, buttonText } =
+          database.heroSection;
+        const heroSection = document.getElementById("heroSection");
+        const heroContent = document.getElementById("heroContent");
+
+        heroSection.style.backgroundImage = `url("${backgroundImage}")`;
+        heroContent.innerHTML = `
+          <h1 class="text-5xl font-bold mb-4 animate__animated animate__fadeInDown">${title}</h1>
+          <p class="text-xl mb-8 animate__animated animate__fadeInUp">${description}</p>
+          <button id="exploreButton" class="bg-emerald-600 text-white py-2 px-6 rounded-full hover:bg-emerald-700 transition-colors text-lg font-semibold animate__animated animate__bounceIn">
+            ${buttonText}
+          </button>
+        `;
+      }
+
+      function setupOptions() {
+        const optionsContainer = document.getElementById("optionsContainer");
+        database.options.forEach((option, index) => {
+          const card = createOptionCard(option, index);
+          optionsContainer.appendChild(card);
+        });
+      }
+
+      function createOptionCard(option, index) {
+        const card = document.createElement("div");
+        card.className =
+          "bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 p-6 hover-grow fade-in";
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.innerHTML = `
+          <div class="flex items-center mb-4">
+            <i class="${option.icon} text-2xl text-emerald-600 mr-3"></i>
+            <h2 class="text-xl font-semibold animate-color">${option.name}</h2>
+          </div>
+          <p class="text-gray-600 mb-4">${option.description}</p>
+          <button onclick="showContent(${JSON.stringify(
+            option
+          )})" class="w-full bg-emerald-600 text-white py-2 px-4 rounded hover:bg-emerald-700 transition-colors hover-text-animation">
+            Explore ${option.name}
+          </button>
+        `;
+        return card;
+      }
+
+      function setupExploreButton() {
+        document
+          .getElementById("exploreButton")
+          .addEventListener("click", () => {
+            document
+              .getElementById("optionsContainer")
+              .scrollIntoView({ behavior: "smooth" });
+          });
+      }
+
+      function showContent(option) {
+        const contentSection = document.getElementById("contentSection");
+        contentSection.innerHTML = `
+          <button id="closeBtn" class="absolute top-4 right-4 text-gray-600 hover:text-gray-800 focus:outline-none">
+            <i class="fas fa-times text-2xl"></i>
+          </button>
+          <h2 class="text-3xl font-bold mb-6 animate__animated animate__fadeInDown">${
+            option.name
+          }</h2>
+          <p class="text-xl mb-8 animate__animated animate__fadeInUp">${
+            option.description
+          }</p>
+          ${renderContent(option)}
+        `;
+        showContentSection(contentSection);
+        setupCloseButton();
+      }
+
+      function showContentSection(contentSection) {
+        contentSection.classList.add(
+          "active",
+          "animate__animated",
+          "animate__fadeIn"
+        );
+        document.body.style.overflow = "hidden";
+        contentSection.style.display = "block";
+        contentSection.style.position = "fixed";
+        contentSection.style.top = "0";
+        contentSection.style.left = "0";
+        contentSection.style.width = "100vw";
+        contentSection.style.height = "100vh";
+        contentSection.style.backgroundColor = "#f9fafb";
+        contentSection.style.overflowY = "auto";
+        contentSection.style.zIndex = "9999";
+        contentSection.style.padding = "2rem";
+        contentSection.style.marginTop = "-10px";
+        document.querySelector("header").style.display = "none";
+      }
+
+      function setupCloseButton() {
+        document
+          .getElementById("closeBtn")
+          .addEventListener("click", closeContent);
+      }
+
+      function closeContent() {
+        const contentSection = document.getElementById("contentSection");
+        contentSection.classList.add("animate__animated", "animate__fadeOut");
+        setTimeout(() => {
+          contentSection.classList.remove(
+            "active",
+            "animate__animated",
+            "animate__fadeOut"
+          );
+          document.body.style.overflow = "auto";
+          contentSection.style.display = "none";
+          document.querySelector("header").style.display = "flex";
+        }, 500);
+      }
+
+      function renderContent(option) {
+        const contentRenderers = {
+          Colleges: renderColleges,
+          "Job Opportunities": renderJobs,
+          Scholarships: renderScholarships,
+        };
+        const renderer =
+          contentRenderers[option.name] ||
+          (() => "<p>Content for this option is not available.</p>");
+        return renderer(option.content);
+      }
+
+      function renderColleges(colleges) {
+        if (!colleges || !colleges.ivyLeague || !colleges.midTier) {
+          return "<p>No college data available.</p>";
+        }
+
+        const allColleges = [...colleges.ivyLeague, ...colleges.midTier];
+        const content = `
+          <h3 class='text-2xl font-semibold mb-6 animate__animated animate__fadeInDown'>Top Computer Science Colleges in India</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+              <h4 class="text-xl font-semibold mb-4 text-emerald-600">College Rankings</h4>
+              <canvas id="collegeRankingsChart"></canvas>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+              <h4 class="text-xl font-semibold mb-4 text-emerald-600">Specialization Distribution</h4>
+              <canvas id="specializationChart"></canvas>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+              <thead class="bg-gradient-to-r from-emerald-500 to-emerald-700 text-white">
+                <tr>
+                  <th class="py-3 px-4 text-left">Name</th>
+                  <th class="py-3 px-4 text-left">Ranking</th>
+                  <th class="py-3 px-4 text-left">Location</th>
+                  <th class="py-3 px-4 text-left">Specialization</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${allColleges
+                  .map(
+                    (college, index) => `
+                  <tr class="animate__animated animate__fadeIn hover:bg-emerald-50 transition-colors duration-200" style="animation-delay: ${
+                    index * 0.1
+                  }s">
+                    <td class="py-3 px-4 border-b">${college.name}</td>
+                    <td class="py-3 px-4 border-b">#${college.ranking}</td>
+                    <td class="py-3 px-4 border-b">${college.location}</td>
+                    <td class="py-3 px-4 border-b">${
+                      college.specialization
+                    }</td>
+                  </tr>
+                `
+                  )
+                  .join("")}
+              </tbody>
+            </table>
+          </div>
+        `;
+
+        setTimeout(() => renderCollegeCharts(allColleges), 0);
+        return content;
+      }
+
+      function renderCollegeCharts(colleges) {
+        renderCollegeRankingsChart(colleges);
+        renderSpecializationChart(colleges);
+      }
+
+      function renderCollegeRankingsChart(colleges) {
+        const ctx = document
+          .getElementById("collegeRankingsChart")
+          .getContext("2d");
+        new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: colleges.map((college) => college.name),
+            datasets: [
+              {
+                label: "College Rankings",
+                data: colleges.map((college) => college.ranking),
+                backgroundColor: "rgba(16, 185, 129, 0.6)",
+                borderColor: "rgba(16, 185, 129, 1)",
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true,
+                reverse: true,
+                title: { display: true, text: "Ranking" },
+              },
+            },
+          },
+        });
+      }
+
+      function renderSpecializationChart(colleges) {
+        const specializationCounts = colleges.reduce((counts, college) => {
+          counts[college.specialization] =
+            (counts[college.specialization] || 0) + 1;
+          return counts;
+        }, {});
+
+        const ctx = document
+          .getElementById("specializationChart")
+          .getContext("2d");
+        new Chart(ctx, {
+          type: "pie",
+          data: {
+            labels: Object.keys(specializationCounts),
+            datasets: [
+              {
+                data: Object.values(specializationCounts),
+                backgroundColor: [
+                  "rgba(255, 99, 132, 0.8)",
+                  "rgba(54, 162, 235, 0.8)",
+                  "rgba(255, 206, 86, 0.8)",
+                  "rgba(75, 192, 192, 0.8)",
+                  "rgba(153, 102, 255, 0.8)",
+                ],
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: "right" },
+              title: { display: true, text: "Specialization Distribution" },
+            },
+          },
+        });
+      }
+
+      function renderJobs(jobs) {
+        if (!jobs || jobs.length === 0) {
+          return "<p>No job data available.</p>";
+        }
+
+        const content = `
+          <h3 class='text-2xl font-semibold mb-6 animate__animated animate__fadeInDown'>Career Paths in Computer Science</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+              <h4 class="text-xl font-semibold mb-4 text-emerald-600">Average Salaries</h4>
+              <canvas id="salaryChatChart"></canvas>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+              <h4 class="text-xl font-semibold mb-4 text-emerald-600">Job Growth Rates</h4>
+              <canvas id="growthRateChart"></canvas>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            ${jobs
+              .map(
+                (job, index) => `
+              <div class="bg-white p-6 rounded-lg shadow-md animate__animated animate__fadeIn hover:shadow-lg transition-shadow duration-300" style="animation-delay: ${
+                index * 0.1
+              }s">
+                <h4 class="font-semibold mb-3 text-emerald-600 text-xl">${
+                  job.role
+                }</h4>
+                <p class="text-gray-700 mb-2"><i class="fas fa-money-bill-wave mr-2 text-emerald-500"></i>Average Salary: ${
+                  job.avgSalary
+                }</p>
+                <p class="text-gray-700 mb-2"><i class="fas fa-chart-line mr-2 text-emerald-500"></i>Growth: ${
+                  job.growth
+                }</p>
+                <p class="text-gray-700"><i class="fas fa-tools mr-2 text-emerald-500"></i>Skills: ${
+                  job.skills
+                }</p>
+              </div>
+            `
+              )
+              .join("")}
+          </div>
+        `;
+
+        setTimeout(() => renderJobCharts(jobs), 0);
+        return content;
+      }
+
+      function renderJobCharts(jobs) {
+        renderSalaryChart(jobs);
+        renderGrowthRateChart(jobs);
+      }
+
+      function renderSalaryChart(jobs) {
+        const ctx = document.getElementById("salaryChatChart").getContext("2d");
+        new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: jobs.map((job) => job.role),
+            datasets: [
+              {
+                label: "Average Salary",
+                data: jobs.map((job) =>
+                  parseInt(job.avgSalary.replace(/[^0-9]/g, ""))
+                ),
+                backgroundColor: "rgba(16, 185, 129, 0.6)",
+                borderColor: "rgba(16, 185, 129, 1)",
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: { display: true, text: "Salary (USD)" },
+              },
+            },
+          },
+        });
+      }
+
+      function renderGrowthRateChart(jobs) {
+        const ctx = document.getElementById("growthRateChart").getContext("2d");
+        new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: jobs.map((job) => job.role),
+            datasets: [
+              {
+                label: "Growth Rate",
+                data: jobs.map((job) => parseFloat(job.growth)),
+                fill: false,
+                borderColor: "rgb(75, 192, 192)",
+                tension: 0.1,
+              },
+            ],
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: { display: true, text: "Growth Rate (%)" },
+              },
+            },
+          },
+        });
+      }
+
+      function renderScholarships(scholarships) {
+        if (!scholarships || scholarships.length === 0) {
+          return "<p>No scholarship data available.</p>";
+        }
+
+        const content = `
+          <h3 class='text-2xl font-semibold mb-6 animate__animated animate__fadeInDown'>Scholarship Opportunities for Computer Science Students</h3>
+          <div class="mb-8">
+            <canvas id="scholarshipChart"></canvas>
+          </div>
+          <div class="space-y-6">
+            ${scholarships
+              .map(
+                (scholarship, index) => `
+              <div class="bg-white p-6 rounded-lg shadow-md animate__animated animate__fadeIn hover:shadow-lg transition-shadow duration-300" style="animation-delay: ${
+                index * 0.1
+              }s">
+                <h4 class="font-semibold mb-3 text-emerald-600 text-xl">${
+                  scholarship.name
+                }</h4>
+                <p class="text-gray-700 mb-2"><i class="fas fa-dollar-sign mr-2 text-emerald-500"></i>Amount: ${
+                  scholarship.amount
+                }</p>
+                <p class="text-gray-700"><i class="fas fa-user-graduate mr-2 text-emerald-500"></i>Eligibility: ${
+                  scholarship.eligibility
+                }</p>
+              </div>
+            `
+              )
+              .join("")}
+          </div>
+        `;
+
+        setTimeout(() => renderScholarshipChart(scholarships), 0);
+        return content;
+      }
+
+      function renderScholarshipChart(scholarships) {
+        const ctx = document
+          .getElementById("scholarshipChart")
+          .getContext("2d");
+        new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: scholarships.map((s) => s.name),
+            datasets: [
+              {
+                label: "Scholarship Amount",
+                data: scholarships.map((s) =>
+                  parseFloat(s.amount.replace(/[^0-9.-]+/g, ""))
+                ),
+                backgroundColor: "rgba(75, 192, 192, 0.6)",
+                borderColor: "rgba(75, 192, 192, 1)",
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: "Amount ($)",
+                },
+              },
+            },
+          },
+        });
+      }
+
+      // Call initializePage when the DOM is fully loaded
+      document.addEventListener("DOMContentLoaded", initializePage);
+
+      // Make showContent available globally
+      window.showContent = showContent;

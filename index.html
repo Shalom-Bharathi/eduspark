@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EDUspark - Ignite Your Future</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        transition: 1s !important;
+      }
+
+      @keyframes rainbow-text {
+        0% {
+          color: #243642;
+        }
+        25% {
+          color: #387478;
+        }
+        50% {
+          color: #629584;
+        }
+        75% {
+          color: #387478;
+        }
+        100% {
+          color: #243642;
+        }
+      }
+
+      .animate-rainbow-text {
+        animation: rainbow-text 5s linear infinite;
+      }
+      .animate-fade-in {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+      }
+
+      .animate-fade-in.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .hover-grow {
+        transition: transform 0.3s ease;
+      }
+
+      .hover-grow:hover {
+        transform: scale(1.05);
+      }
+
+      #startButton {
+        transition: 0.5s !important;
+      }
+
+      #heroBG {
+        background: linear-gradient(
+            rgba(255, 255, 255, 0.7),
+            rgba(255, 255, 255, 0.7)
+          ),
+          /* Transparent overlay */ url("./assets/images/hero.png"); /* Background image */
+      }
+    </style>
+  </head>
+  <body class="bg-white">
+    <div class="flex flex-col min-h-screen">
+      <header
+        class="px-4 lg:px-6 h-16 flex items-center bg-white border-b border-slate-200 sticky top-0 z-50"
+      >
+        <a class="flex items-center justify-center" href="#">
+          <i class="fas fa-book-open text-2xl text-emerald-600"></i>
+          <span class="ml-2 text-2xl font-bold text-black">EDUspark</span>
+        </a>
+        <nav class="ml-auto flex gap-4 sm:gap-6">
+          <a
+            class="text-sm font-medium text-slate-700 hover:text-emerald-600 transition-colors"
+            href="#features"
+            >Features</a
+          >
+          <a
+            class="text-sm font-medium text-slate-700 hover:text-emerald-600 transition-colors"
+            href="#about"
+            >About</a
+          >
+          <a
+            class="text-sm font-medium text-slate-700 hover:text-emerald-600 transition-colors"
+            href="#contact"
+            >Contact</a
+          >
+        </nav>
+      </header>
+
+      <main class="flex-1">
+        <section
+          id="heroBG"
+          class="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-slate-50"
+        >
+          <div class="container px-4 md:px-6 mx-auto">
+            <div class="flex flex-col items-center space-y-4 text-center">
+              <div class="space-y-2">
+                <h1
+                  class="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none text-slate-900 animate-rainbow-text"
+                >
+                  Ignite Your Future with EDUspark
+                </h1>
+                <p
+                  class="mx-auto max-w-[700px] text-slate-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed"
+                >
+                  Discover your perfect career path with personalized guidance
+                  and comprehensive resources.
+                </p>
+              </div>
+              <a href="./pages/branch.html">
+                <button
+                  id="startButton"
+                  class="bg-emerald-600 text-white hover:bg-emerald-700 text-lg px-8 py-3 rounded-md transition-colors duration-300 hover-grow"
+                >
+                  Start Your Journey
+                </button>
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section id="features" class="w-full py-12 md:py-24 lg:py-32">
+          <div class="container px-4 md:px-6 mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-12 text-slate-900">
+              Why Choose EDUspark?
+            </h2>
+            <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+              <div
+                class="flex flex-col items-center space-y-4 text-center animate-fade-in"
+              >
+                <i class="fas fa-chart-line text-4xl text-emerald-600"></i>
+                <h3 class="text-xl font-bold text-slate-900">
+                  Career Exploration
+                </h3>
+                <p class="text-slate-500">
+                  Explore various professions and pathways tailored to your
+                  interests and skills. Our extensive database covers a wide
+                  range of industries and roles.
+                </p>
+              </div>
+              <div
+                class="flex flex-col items-center space-y-4 text-center animate-fade-in"
+              >
+                <i class="fas fa-award text-4xl text-emerald-600"></i>
+                <h3 class="text-xl font-bold text-slate-900">
+                  Personalized Recommendations
+                </h3>
+                <p class="text-slate-500">
+                  Receive career suggestions based on your preferences,
+                  abilities, and academic background. Our intelligent system
+                  adapts to your unique profile.
+                </p>
+              </div>
+              <div
+                class="flex flex-col items-center space-y-4 text-center animate-fade-in"
+              >
+                <i class="fas fa-book-open text-4xl text-emerald-600"></i>
+                <h3 class="text-xl font-bold text-slate-900">
+                  Educational Resources
+                </h3>
+                <p class="text-slate-500">
+                  Access comprehensive information on scholarships, courses, and
+                  skill-building opportunities aligned with your career choices.
+                </p>
+              </div>
+              <div
+                class="flex flex-col items-center space-y-4 text-center animate-fade-in"
+              >
+                <i class="fas fa-rocket text-4xl text-emerald-600"></i>
+                <h3 class="text-xl font-bold text-slate-900">
+                  Future-Ready Insights
+                </h3>
+                <p class="text-slate-500">
+                  Stay ahead with information on future prospects, expected job
+                  market trends, and emerging career opportunities in various
+                  fields.
+                </p>
+              </div>
+              <div
+                class="flex flex-col items-center space-y-4 text-center animate-fade-in"
+              >
+                <i class="fas fa-users text-4xl text-emerald-600"></i>
+                <h3 class="text-xl font-bold text-slate-900">
+                  Community Support
+                </h3>
+                <p class="text-slate-500">
+                  Connect with peers, mentors, and industry professionals. Share
+                  experiences and get valuable advice for your career journey.
+                </p>
+              </div>
+              <div
+                class="flex flex-col items-center space-y-4 text-center animate-fade-in"
+              >
+                <i class="fas fa-chart-bar text-4xl text-emerald-600"></i>
+                <h3 class="text-xl font-bold text-slate-900">
+                  Progress Tracking
+                </h3>
+                <p class="text-slate-500">
+                  Monitor your growth, set goals, and track your achievements.
+                  Visualize your progress and stay motivated on your path to
+                  success.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="about" class="w-full py-12 md:py-24 lg:py-32 bg-slate-50">
+          <div class="container px-4 md:px-6 mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-12 text-slate-900">
+              How It Works
+            </h2>
+            <div class="grid gap-8 md:grid-cols-3">
+              <div
+                class="bg-white p-6 rounded-lg shadow-md hover-grow animate-fade-in"
+              >
+                <h3 class="text-xl font-bold mb-4 text-emerald-600">
+                  1. Explore
+                </h3>
+                <p class="text-slate-500">
+                  Browse through our extensive database of careers and
+                  educational pathways. Get detailed insights into various
+                  professions.
+                </p>
+              </div>
+              <div
+                class="bg-white p-6 rounded-lg shadow-md hover-grow animate-fade-in"
+              >
+                <h3 class="text-xl font-bold mb-4 text-emerald-600">
+                  2. Analyze
+                </h3>
+                <p class="text-slate-500">
+                  Take assessments and quizzes to understand your strengths,
+                  interests, and aptitudes. Let our AI analyze your profile.
+                </p>
+              </div>
+              <div
+                class="bg-white p-6 rounded-lg shadow-md hover-grow animate-fade-in"
+              >
+                <h3 class="text-xl font-bold mb-4 text-emerald-600">3. Act</h3>
+                <p class="text-slate-500">
+                  Receive personalized recommendations and actionable steps to
+                  pursue your chosen career path with confidence.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer id="contact" class="bg-slate-900 text-white py-8">
+        <div class="container px-4 md:px-6 mx-auto">
+          <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <h3 class="text-lg font-semibold mb-4">EDUspark</h3>
+              <p class="text-sm text-slate-400">
+                Empowering students to make informed career decisions.
+              </p>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+              <ul class="space-y-2 text-sm">
+                <li>
+                  <a
+                    href="./pages/branch.html"
+                    class="text-slate-400 hover:text-emerald-400 transition-colors"
+                    >Explore</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#about"
+                    class="text-slate-400 hover:text-emerald-400 transition-colors"
+                    >About Us</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#features"
+                    class="text-slate-400 hover:text-emerald-400 transition-colors"
+                    >Careers</a
+                  >
+                </li>
+                <li></li>
+              </ul>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold mb-4">Contact</h3>
+              <p class="text-sm text-slate-400">info@eduspark.com</p>
+              <p class="text-sm text-slate-400">+(91) 7845780011</p>
+            </div>
+          </div>
+          <div
+            class="mt-8 border-t border-slate-800 pt-8 flex flex-col sm:flex-row justify-between items-center"
+          >
+            <p class="text-sm text-slate-400">
+              © 2024 EDUspark. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      // Smooth scrolling for navigation links
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          document.querySelector(this.getAttribute("href")).scrollIntoView({
+            behavior: "smooth",
+          });
+        });
+      });
+
+      // Animate elements on scroll
+      const animateOnScroll = () => {
+        const elements = document.querySelectorAll(".animate-fade-in");
+        elements.forEach((element) => {
+          const elementTop = element.getBoundingClientRect().top;
+          const elementBottom = element.getBoundingClientRect().bottom;
+          const isVisible =
+            elementTop < window.innerHeight && elementBottom >= 0;
+          if (isVisible) {
+            element.classList.add("visible");
+          }
+        });
+      };
+
+      window.addEventListener("scroll", animateOnScroll);
+      window.addEventListener("load", animateOnScroll);
+    </script>
+  </body>
+</html>
