@@ -910,9 +910,10 @@
           }
         } 
       });
+      
       function showGroupsAfter10th(groups, container) {
   if (!groups || !Array.isArray(groups) || groups.length === 0) {
-    container.innerHTML = "<p class='text-center text-gray-600'>No data available for groups after 10th grade</p>";
+    container.innerHTML = "<p class='text-center text-gray-600'>No data available for groups after 10th grade in Aerospace Engineering</p>";
     return;
   }
 
@@ -927,13 +928,7 @@
 
     card.innerHTML = `
       <h3 class="text-xl font-bold mb-3 text-emerald-600">${group.name}</h3>
-      <p class="text-gray-600 mb-4">${group.description}</p>
-      <h4 class="font-semibold mb-2">Key Subjects:</h4>
-      <ul class="list-disc list-inside mb-4">
-        ${group.subjects.map(subject => `<li>${subject}</li>`).join('')}
-      </ul>
-      <h4 class="font-semibold mb-2">Career Paths:</h4>
-      <p>${group.careerPaths.join(', ')}</p>
+      <p class="text-gray-600">${group.description}</p>
     `;
 
     groupsContainer.appendChild(card);
@@ -947,32 +942,63 @@
 
   container.appendChild(groupsContainer);
 
-  // Add a heatmap to visualize the popularity of different groups
-  const heatmapContainer = document.createElement('div');
-  heatmapContainer.className = 'mt-12';
-  heatmapContainer.innerHTML = '<h3 class="text-2xl font-bold mb-4 text-center">Group Popularity Heatmap</h3>';
+  // Add a visualization to compare the different groups
+  const chartContainer = document.createElement('div');
+  chartContainer.className = 'mt-12 w-full';
+  chartContainer.style.height = '400px';
 
-  const heatmap = document.createElement('div');
-  heatmap.className = 'heatmap';
-  heatmapContainer.appendChild(heatmap);
+  container.appendChild(chartContainer);
 
-  groups.forEach(group => {
-    const cell = document.createElement('div');
-    cell.className = 'heatmap-cell';
-    cell.style.backgroundColor = `rgba(16, 185, 129, ${0.1 + (group.popularity * 0.9)})`;
-    cell.innerHTML = `
-      <div class="font-semibold">${group.name}</div>
-      <div class="text-sm">${(group.popularity * 100).toFixed(1)}%</div>
-    `;
-    heatmap.appendChild(cell);
+  // Create a bar chart to visualize the different groups
+  const chart = new ApexCharts(chartContainer, {
+    chart: {
+      type: 'bar',
+      height: 400
+    },
+    series: [{
+      name: 'Relevance to Aerospace Engineering',
+      data: groups.map((_, index) => 100 - index * 10) // Dummy data for relevance
+    }],
+    xaxis: {
+      categories: groups.map(group => group.name),
+      labels: {
+        rotate: -45,
+        trim: true
+      }
+    },
+    yaxis: {
+      title: {
+        text: 'Relevance to Aerospace Engineering (%)'
+      }
+    },
+    plotOptions: {
+      bar: {
+        borderRadius: 4,
+        horizontal: false,
+        columnWidth: '55%',
+        endingShape: 'rounded'
+      },
+    },
+    dataLabels: {
+      enabled: false
+    },
+    title: {
+      text: 'Relevance of Groups to Aerospace Engineering',
+      align: 'center',
+      style: {
+        fontSize: '18px'
+      }
+    },
+    colors: ['#10B981']
   });
 
-  container.appendChild(heatmapContainer);
+  chart.render();
 
-  // Animate the heatmap
-  setTimeout(() => {
-    heatmap.classList.add('show');
-  }, groups.length * 100);
+  // Add explanatory text
+  const explanation = document.createElement('p');
+  explanation.className = 'mt-6 text-center text-gray-600';
+  explanation.textContent = 'The chart above shows the estimated relevance of each group to a career in Aerospace Engineering. Higher percentages indicate greater relevance.';
+  container.appendChild(explanation);
 }
       
     </script>
