@@ -10,6 +10,9 @@
       rel="stylesheet"
     />
     <style>
+      #aiButton {
+        transition: 1s !important;
+      }
       body {
         transition: 1s !important;
       }
@@ -81,10 +84,6 @@
           transform: scale(1);
         }
       }
-
-      .ai-gradient-bg {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      }
     </style>
   </head>
   <body class="bg-white">
@@ -106,6 +105,11 @@
             class="text-sm font-medium text-slate-700 hover:text-emerald-600 transition-colors"
             href="#about"
             >About</a
+          >
+          <a
+            class="text-sm font-medium text-slate-700 hover:text-emerald-600 transition-colors"
+            href="#ai-recommendation"
+            >AI Recommendation</a
           >
           <a
             class="text-sm font-medium text-slate-700 hover:text-emerald-600 transition-colors"
@@ -275,24 +279,22 @@
           </div>
         </section>
 
-        <section
-          id="ai-recommendation"
-          class="w-full py-12 md:py-24 lg:py-32 ai-gradient-bg text-white"
-        >
+        <section id="ai-recommendation" class="w-full py-12 md:py-24 lg:py-32">
           <div class="container px-4 md:px-6 mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-12 text-slate-900">
+              AI-Powered Career Recommendation
+            </h2>
             <div class="flex flex-col md:flex-row items-center justify-between">
               <div class="md:w-1/2 mb-8 md:mb-0">
-                <h2 class="text-4xl font-bold mb-6">
-                  AI-Powered Career Recommendation
-                </h2>
-                <p class="text-xl mb-8">
+                <p class="text-xl mb-8 text-slate-500">
                   Unlock your potential with our cutting-edge AI system. Get
                   personalized career recommendations tailored to your unique
                   profile, skills, and interests.
                 </p>
                 <a href="./pages/ai.html">
                   <button
-                    class="bg-white text-emerald-600 hover:bg-emerald-100 text-lg px-8 py-3 rounded-md transition-colors duration-300 hover-grow"
+                    id="aiButton"
+                    class="bg-emerald-600 text-white hover:bg-emerald-700 text-lg px-8 py-3 rounded-md transition-colors duration-300 hover-grow"
                   >
                     <i class="fas fa-robot mr-2"></i>
                     Get AI Recommendation
@@ -302,9 +304,11 @@
               <div class="md:w-1/2 flex justify-center">
                 <div class="relative">
                   <i
-                    class="fas fa-brain text-9xl text-white opacity-20 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                    class="fas fa-brain text-9xl text-emerald-600 opacity-20 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
                   ></i>
-                  <i class="fas fa-cogs text-6xl text-white ai-icon-pulse"></i>
+                  <i
+                    class="fas fa-cogs text-6xl text-emerald-600 ai-icon-pulse"
+                  ></i>
                 </div>
               </div>
             </div>
@@ -376,7 +380,6 @@
         });
       });
 
-      // Animate elements on scroll
       const animateOnScroll = () => {
         const elements = document.querySelectorAll(".animate-fade-in");
         elements.forEach((element) => {
