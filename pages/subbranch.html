@@ -158,7 +158,6 @@
 
       console.log("Sub-branches:", subBranches);
 
-      // Update the title
       document.querySelector(
         "h1"
       ).textContent = `${selectedBranch} Disciplines`;
@@ -184,7 +183,6 @@
         engineeringBranchesContainer.appendChild(card);
       });
 
-      // GSAP animations
       gsap.registerPlugin(ScrollTrigger);
 
       gsap.from("header", {

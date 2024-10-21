@@ -324,7 +324,6 @@
     </div>
 
     <script>
-      // Load saved responses from localStorage
       document.addEventListener("DOMContentLoaded", function () {
         const questions = [
           "q1",
@@ -420,7 +419,7 @@
         .getElementById("surveyForm")
         .addEventListener("submit", function (event) {
           event.preventDefault();
-          console.log("Form submitted"); // Add this line for debugging
+          console.log("Form submitted");
           const userResponses = {
             favoriteSubject: document.getElementById("q1").value,
             workPreference: document.getElementById("q2").value,
@@ -436,12 +435,11 @@
             longTermGoals: document.getElementById("q12").value,
           };
 
-          // Save responses to localStorage
           for (const [key, value] of Object.entries(userResponses)) {
             localStorage.setItem(key, value);
           }
 
-          console.log("User responses:", userResponses); // Add this line for debugging
+          console.log("User responses:", userResponses);
 
           const db = firebase.firestore();
           const apiKeyRef = db.collection("apiKeys").doc("openai");
@@ -451,22 +449,19 @@
             .then((doc) => {
               if (doc.exists) {
                 const apiKey = doc.data().key;
-                console.log("API key found"); // Add this line for debugging
+                console.log("API key found");
                 sendToChatGPT(apiKey, userResponses);
               } else {
                 console.log("No API key found in Firestore");
-                // Handle the case when no API key is found
               }
             })
             .catch((error) => {
               console.error("Error fetching API key:", error);
-              // Handle the error
             });
         });
 
       function sendToChatGPT(apiKey, userResponses) {
-        console.log("Sending request to ChatGPT"); // Add this line for debugging
-        // Send data to ChatGPT API and get a response
+        console.log("Sending request to ChatGPT");
         const userResponsesJson = JSON.stringify(userResponses);
         fetch("https://api.openai.com/v1/chat/completions", {
           method: "POST",
@@ -488,7 +483,7 @@
         })
           .then((response) => response.json())
           .then((data) => {
-            console.log("Received response from ChatGPT:", data); // Add this line for debugging
+            console.log("Received response from ChatGPT:", data);
             const recommendedCareer = data.choices[0].message.content;
             const [careerLine, reasonLine] = recommendedCareer.split("\n");
             const careerName = careerLine.split(":")[1].trim();
@@ -517,7 +512,6 @@
           });
       }
 
-      // GSAP animations
       gsap.registerPlugin(ScrollTrigger);
 
       gsap.from("header", {

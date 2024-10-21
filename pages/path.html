@@ -489,7 +489,6 @@
             return;
           }
 
-          // Create Job Opportunities Graph
           const chartContainer = document.createElement("div");
           chartContainer.className = "chart-container";
           chartContainer.style.height = "500px";
@@ -511,7 +510,6 @@
             currentYear,
           ];
 
-          // Generate dummy growth data
           const growthData = jobContent.map((job) => {
             const finalGrowth = parseFloat(job.growth.replace("%", ""));
             return years.map((year, index) => {
@@ -736,7 +734,7 @@
             });
 
             collegeContainer.appendChild(categoryDiv);
-            // Add show class for animation
+
             setTimeout(() => {
               categoryDiv.classList.add("show");
             }, 100);
@@ -808,7 +806,7 @@
                   </div>
                 `;
             container.appendChild(card);
-            // Add show class with staggered delay
+
             setTimeout(() => {
               card.classList.add("show");
             }, 100 * idx);
@@ -825,7 +823,6 @@
             return;
           }
 
-          // Create Scholarships Graph
           const chartContainer = document.createElement("div");
           chartContainer.className = "chart-container";
           chartContainer.style.height = "400px";
@@ -891,7 +888,6 @@
             `;
             scholarshipsContainer.appendChild(card);
 
-            // Add show class with staggered delay
             setTimeout(() => {
               card.classList.add("show");
             }, 100 * idx);
