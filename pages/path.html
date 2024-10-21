@@ -736,6 +736,7 @@
             });
 
             collegeContainer.appendChild(categoryDiv);
+            // Add show class for animation
             setTimeout(() => {
               categoryDiv.classList.add("show");
             }, 100);
@@ -820,10 +821,59 @@
             !Array.isArray(scholarships) ||
             scholarships.length === 0
           ) {
-            container.innerHTML =
-              "<p class='no-data'>No scholarship data available</p>";
+            container.innerHTML = "<p>No scholarship data available</p>";
             return;
           }
+
+          // Create Scholarships Graph
+          const chartContainer = document.createElement("div");
+          chartContainer.className = "chart-container";
+          chartContainer.style.height = "400px";
+          chartContainer.style.width = "90%";
+          chartContainer.style.margin = "0 auto 2rem auto";
+          container.appendChild(chartContainer);
+
+          const ctx = document.createElement("canvas");
+          ctx.id = "scholarshipsChart";
+          chartContainer.appendChild(ctx);
+
+          const scholarshipNames = scholarships.map(
+            (scholarship) => scholarship.name
+          );
+          const scholarshipAmounts = scholarships.map((scholarship) =>
+            parseInt(scholarship.amount.replace(/[^0-9]/g, ""), 10)
+          );
+
+          const chartData = {
+            labels: scholarshipNames,
+            datasets: [
+              {
+                label: "Scholarship Amounts",
+                data: scholarshipAmounts,
+                backgroundColor: "rgba(75, 192, 192, 0.6)",
+                borderColor: "rgba(75, 192, 192, 1)",
+                borderWidth: 1,
+              },
+            ],
+          };
+
+          const chartOptions = {
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: "Amount (₹)",
+                },
+              },
+            },
+          };
+
+          const scholarshipsChart = new Chart(ctx, {
+            type: "bar",
+            data: chartData,
+            options: chartOptions,
+          });
 
           const scholarshipsContainer = document.createElement("div");
           scholarshipsContainer.className = "scholarships-container";
@@ -833,17 +883,17 @@
             const card = document.createElement("div");
             card.className = "scholarship-card";
             card.innerHTML = `
-                <div class="card-content" style="background: #C1CFA1; border-radius: 8px; padding: 20px; margin: 10px 0; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); transition: transform 0.3s;">
-                    <h3 style="color: #333; font-size: 1.5em; margin-bottom: 10px;">${scholarship.name}</h3>
-                    <p style="font-weight: bold; color: #2c3e50;">Amount: <span style="color: #e74c3c;">${scholarship.amount}</span></p>
+                <div class="card-content">
+                    <h3>${scholarship.name}</h3>
+                    <p><strong>Amount:</strong> ${scholarship.amount}</p>
                     <p><strong>Eligibility:</strong> ${scholarship.eligibility}</p>
                 </div>
             `;
             scholarshipsContainer.appendChild(card);
 
+            // Add show class with staggered delay
             setTimeout(() => {
               card.classList.add("show");
-              card.style.transform = "translateY(0)";
             }, 100 * idx);
           });
         }
@@ -907,100 +957,8 @@
             default:
               return "gray";
           }
-        } 
+        }
       });
-      
-      function showGroupsAfter10th(groups, container) {
-  if (!groups || !Array.isArray(groups) || groups.length === 0) {
-    container.innerHTML = "<p class='text-center text-gray-600'>No data available for groups after 10th grade in Aerospace Engineering</p>";
-    return;
-  }
-
-  const groupsContainer = document.createElement('div');
-  groupsContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
-
-  groups.forEach((group, index) => {
-    const card = document.createElement('div');
-    card.className = 'bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 p-6';
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(20px)';
-
-    card.innerHTML = `
-      <h3 class="text-xl font-bold mb-3 text-emerald-600">${group.name}</h3>
-      <p class="text-gray-600">${group.description}</p>
-    `;
-
-    groupsContainer.appendChild(card);
-
-    // Animate the card
-    setTimeout(() => {
-      card.style.opacity = '1';
-      card.style.transform = 'translateY(0)';
-    }, index * 100);
-  });
-
-  container.appendChild(groupsContainer);
-
-  // Add a visualization to compare the different groups
-  const chartContainer = document.createElement('div');
-  chartContainer.className = 'mt-12 w-full';
-  chartContainer.style.height = '400px';
-
-  container.appendChild(chartContainer);
-
-  // Create a bar chart to visualize the different groups
-  const chart = new ApexCharts(chartContainer, {
-    chart: {
-      type: 'bar',
-      height: 400
-    },
-    series: [{
-      name: 'Relevance to Aerospace Engineering',
-      data: groups.map((_, index) => 100 - index * 10) // Dummy data for relevance
-    }],
-    xaxis: {
-      categories: groups.map(group => group.name),
-      labels: {
-        rotate: -45,
-        trim: true
-      }
-    },
-    yaxis: {
-      title: {
-        text: 'Relevance to Aerospace Engineering (%)'
-      }
-    },
-    plotOptions: {
-      bar: {
-        borderRadius: 4,
-        horizontal: false,
-        columnWidth: '55%',
-        endingShape: 'rounded'
-      },
-    },
-    dataLabels: {
-      enabled: false
-    },
-    title: {
-      text: 'Relevance of Groups to Aerospace Engineering',
-      align: 'center',
-      style: {
-        fontSize: '18px'
-      }
-    },
-    colors: ['#10B981']
-  });
-
-  chart.render();
-
-  // Add explanatory text
-  const explanation = document.createElement('p');
-  explanation.className = 'mt-6 text-center text-gray-600';
-  explanation.textContent = 'The chart above shows the estimated relevance of each group to a career in Aerospace Engineering. Higher percentages indicate greater relevance.';
-  container.appendChild(explanation);
-}
-      
     </script>
   </body>
 </html>
-`
