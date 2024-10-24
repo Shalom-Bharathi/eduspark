@@ -477,484 +477,431 @@
             { opacity: 0, y: 50 },
             { opacity: 1, y: 0, duration: 0.5 }
           );
+
+          // Ensure the content is visible after the animation
+          setTimeout(() => {
+            contentDisplay.style.overflowY = "auto"; // Allow scrolling if content overflows
+          }, 500);
         };
 
-        function showJobOpportunities(jobContent, container) {
-          if (
-            !jobContent ||
-            !Array.isArray(jobContent) ||
-            jobContent.length === 0
-          ) {
-            container.innerHTML = "<p>No job opportunities data available</p>";
+        function showGroupsAfter10th(groupContent, container) {
+          // Clear the container before displaying new content
+          container.innerHTML = "";
+
+          if (!groupContent || groupContent.length === 0) {
+            container.innerHTML = "<p>No educational paths available</p>";
             return;
           }
 
-          const chartContainer = document.createElement("div");
-          chartContainer.className = "chart-container";
-          chartContainer.style.height = "500px";
-          chartContainer.style.width = "90%";
-          chartContainer.style.margin = "0 auto 2rem auto";
-          container.appendChild(chartContainer);
+          const groupContainer = document.createElement("div");
+          groupContainer.className = "group-container";
 
-          const ctx = document.createElement("canvas");
-          ctx.id = "jobOpportunitiesChart";
-          chartContainer.appendChild(ctx);
-
-          const roles = jobContent.map((job) => job.role);
-          const currentYear = new Date().getFullYear();
-          const years = [
-            currentYear - 4,
-            currentYear - 3,
-            currentYear - 2,
-            currentYear - 1,
-            currentYear,
-          ];
-
-          const growthData = jobContent.map((job) => {
-            const finalGrowth = parseFloat(job.growth.replace("%", ""));
-            return years.map((year, index) => {
-              if (index === years.length - 1) return finalGrowth;
-              return Math.max(
-                0,
-                finalGrowth - Math.random() * 5 * (years.length - index - 1)
-              );
-            });
-          });
-
-          const colorPalette = [
-            "rgba(255, 99, 132, 1)",
-            "rgba(54, 162, 235, 1)",
-            "rgba(255, 206, 86, 1)",
-            "rgba(75, 192, 192, 1)",
-            "rgba(153, 102, 255, 1)",
-            "rgba(255, 159, 64, 1)",
-          ];
-
-          const datasets = roles.map((role, index) => ({
-            label: role,
-            data: growthData[index],
-            borderColor: colorPalette[index % colorPalette.length],
-            backgroundColor: colorPalette[index % colorPalette.length].replace(
-              "1)",
-              "0.2)"
-            ),
-            borderWidth: 3,
-            pointBackgroundColor: colorPalette[index % colorPalette.length],
-            pointRadius: 5,
-            pointHoverRadius: 8,
-            fill: false,
-            tension: 0.4,
-          }));
-
-          new Chart(ctx, {
-            type: "line",
-            data: {
-              labels: years,
-              datasets: datasets,
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              scales: {
-                x: {
-                  grid: {
-                    color: "rgba(0, 0, 0, 0.1)",
-                  },
-                  ticks: {
-                    font: {
-                      size: 12,
-                      weight: "bold",
-                    },
-                  },
-                },
-                y: {
-                  beginAtZero: true,
-                  max: Math.max(...growthData.flat()) + 5,
-                  ticks: {
-                    callback: function (value) {
-                      return value + "%";
-                    },
-                    font: {
-                      size: 12,
-                      weight: "bold",
-                    },
-                  },
-                  grid: {
-                    color: "rgba(0, 0, 0, 0.1)",
-                  },
-                },
-              },
-              plugins: {
-                tooltip: {
-                  mode: "index",
-                  intersect: false,
-                  backgroundColor: "rgba(0, 0, 0, 0.7)",
-                  titleFont: {
-                    size: 14,
-                    weight: "bold",
-                  },
-                  bodyFont: {
-                    size: 13,
-                  },
-                  borderColor: "#fff",
-                  borderWidth: 1,
-                  callbacks: {
-                    label: function (context) {
-                      let label = context.dataset.label || "";
-                      if (label) {
-                        label += ": ";
-                      }
-                      if (context.parsed.y !== null) {
-                        label += context.parsed.y.toFixed(2) + "%";
-                      }
-                      return label;
-                    },
-                  },
-                },
-                legend: {
-                  display: true,
-                  position: "bottom",
-                  labels: {
-                    font: {
-                      size: 12,
-                      weight: "bold",
-                    },
-                    boxWidth: 20,
-                    padding: 20,
-                  },
-                },
-                title: {
-                  display: true,
-                  text: "Job Growth Rate Comparison Over Years",
-                  font: {
-                    size: 20,
-                    weight: "bold",
-                  },
-                  padding: {
-                    top: 10,
-                    bottom: 30,
-                  },
-                  color: "#333",
-                },
-              },
-              animation: {
-                duration: 2000,
-                easing: "easeOutQuart",
-              },
-              hover: {
-                mode: "nearest",
-                intersect: true,
-              },
-            },
-          });
-
-          setTimeout(() => {
-            chartContainer.classList.add("show");
-          }, 300);
-
-          const infoText = document.createElement("p");
-          infoText.className = "mt-4 text-center text-gray-600 text-lg";
-          infoText.textContent =
-            "The line chart above illustrates the growth trends for different job roles over the past 5 years, with the current year's growth rate matching the provided data.";
-          container.appendChild(infoText);
-
-          const table = document.createElement("table");
-          table.className = "modern-table mt-8 w-full";
-          table.innerHTML = `
-                <thead>
-                  <tr>
-                    <th class="px-4 py-2">Role</th>
-                    <th class="px-4 py-2">Avg. Salary</th>
-                    <th class="px-4 py-2">Current Growth</th>
-                    <th class="px-4 py-2">Skills</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${jobContent
-                    .map(
-                      (role, index) => `
-                    <tr class="hover:bg-gray-100 transition-colors duration-200">
-                      <td class="px-4 py-2">
-                        <span class="icon mr-2" style="color: ${
-                          colorPalette[index % colorPalette.length]
-                        }">
-                          <i class="${role.icon}"></i>
-                        </span>
-                        ${role.role}
-                      </td>
-                      <td class="px-4 py-2">${role.avgSalary}</td>
-                      <td class="px-4 py-2">${role.growth}</td>
-                      <td class="px-4 py-2">${
-                        Array.isArray(role.skills)
-                          ? role.skills
-                              .map(
-                                (skill) =>
-                                  `<span class="tag tag-blue">${skill}</span>`
-                              )
-                              .join(" ")
-                          : "-"
-                      }</td>
-                    </tr>
-                  `
-                    )
-                    .join("")}
-                </tbody>
-              `;
-          container.appendChild(table);
-          setTimeout(() => {
-            table.classList.add("show");
-          }, 300);
-        }
-
-        function showGroupsAfter10th(collegeContent, container) {
-          if (!collegeContent || Object.keys(collegeContent).length === 0) {
-            container.innerHTML = "<p>No college data available</p>";
-            return;
-          }
-
-          const collegeContainer = document.createElement("div");
-          collegeContainer.className = "college-container";
-
-          const categories = Object.keys(collegeContent);
-          categories.forEach((category) => {
-            const categoryDiv = document.createElement("div");
-            categoryDiv.className = "college-category";
-            categoryDiv.innerHTML = `<h3 class="text-2xl font-bold mb-4">${category}</h3>`;
-
-            collegeContent[category].forEach((college) => {
-              const collegeCard = document.createElement("div");
-              collegeCard.className = "college-card";
-              collegeCard.innerHTML = `
-                    <h3>${college.name}</h3>
-                    <p>Location: ${college.location}</p>
-                    <p>Ranking: #${college.ranking}</p>
-                    <p>Specialization: ${college.specialization}</p>
-                  `;
-              categoryDiv.appendChild(collegeCard);
-            });
-
-            collegeContainer.appendChild(categoryDiv);
-
-            setTimeout(() => {
-              categoryDiv.classList.add("show");
-            }, 100);
-          });
-
-          container.appendChild(collegeContainer);
-        }
-
-        function showEntranceExams(examContent, container) {
-          if (
-            !examContent ||
-            !Array.isArray(examContent) ||
-            examContent.length === 0
-          ) {
-            container.innerHTML = "<p>No entrance exam data available</p>";
-            return;
-          }
-
-          const table = document.createElement("table");
-          table.className = "modern-table";
-          table.innerHTML = `
-                <thead>
-                  <tr>
-                    <th>Exam Name</th>
-                    <th>Type</th>
-                    <th>Subjects</th>
-                    <th>Difficulty</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${examContent
-                    .map(
-                      (exam) => `
-                    <tr>
-                      <td>${exam.name}</td>
-                      <td><span class="tag tag-${mapTagColor(exam.type)}">${
-                        exam.type
-                      }</span></td>
-                      <td>${exam.subjects}</td>
-                      <td><span class="tag tag-${mapTagColor(
-                        exam.difficulty
-                      )}">${exam.difficulty}</span></td>
-                    </tr>
-                  `
-                    )
-                    .join("")}
-                </tbody>
-              `;
-          container.appendChild(table);
-          setTimeout(() => {
-            table.classList.add("show");
-          }, 100);
-        }
-
-        function showMasterCourses(courses, container) {
-          if (!courses || !Array.isArray(courses) || courses.length === 0) {
-            container.innerHTML = "<p>No master courses data available</p>";
-            return;
-          }
-
-          courses.forEach((course, idx) => {
-            const card = document.createElement("div");
-            card.className = "master-card";
-            card.innerHTML = `
-                  <div class="master-card-content">
-                    <h3>${course.name}</h3>
-                    <p>Duration: ${course.duration}</p>
-                    <p>Focus: ${course.focus}</p>
-                  </div>
-                `;
-            container.appendChild(card);
-
-            setTimeout(() => {
-              card.classList.add("show");
-            }, 100 * idx);
-          });
-        }
-
-        function showScholarships(scholarships, container) {
-          if (
-            !scholarships ||
-            !Array.isArray(scholarships) ||
-            scholarships.length === 0
-          ) {
-            container.innerHTML = "<p>No scholarship data available</p>";
-            return;
-          }
-
-          const chartContainer = document.createElement("div");
-          chartContainer.className = "chart-container";
-          chartContainer.style.height = "400px";
-          chartContainer.style.width = "90%";
-          chartContainer.style.margin = "0 auto 2rem auto";
-          container.appendChild(chartContainer);
-
-          const ctx = document.createElement("canvas");
-          ctx.id = "scholarshipsChart";
-          chartContainer.appendChild(ctx);
-
-          const scholarshipNames = scholarships.map(
-            (scholarship) => scholarship.name
-          );
-          const scholarshipAmounts = scholarships.map((scholarship) =>
-            parseInt(scholarship.amount.replace(/[^0-9]/g, ""), 10)
-          );
-
-          const chartData = {
-            labels: scholarshipNames,
-            datasets: [
-              {
-                label: "Scholarship Amounts",
-                data: scholarshipAmounts,
-                backgroundColor: "rgba(75, 192, 192, 0.6)",
-                borderColor: "rgba(75, 192, 192, 1)",
-                borderWidth: 1,
-              },
-            ],
-          };
-
-          const chartOptions = {
-            scales: {
-              y: {
-                beginAtZero: true,
-                title: {
-                  display: true,
-                  text: "Amount (₹)",
-                },
-              },
-            },
-          };
-
-          const scholarshipsChart = new Chart(ctx, {
-            type: "bar",
-            data: chartData,
-            options: chartOptions,
-          });
-
-          const scholarshipsContainer = document.createElement("div");
-          scholarshipsContainer.className = "scholarships-container";
-          container.appendChild(scholarshipsContainer);
-
-          scholarships.forEach((scholarship, idx) => {
-            const card = document.createElement("div");
-            card.className = "scholarship-card";
-            card.innerHTML = `
-                <div class="card-content">
-                    <h3>${scholarship.name}</h3>
-                    <p><strong>Amount:</strong> ${scholarship.amount}</p>
-                    <p><strong>Eligibility:</strong> ${scholarship.eligibility}</p>
-                </div>
+          groupContent.forEach((group) => {
+            const groupCard = document.createElement("div");
+            groupCard.className = "group-card";
+            groupCard.innerHTML = `
+              <h3 class="text-xl font-semibold">${group.name}</h3>
+              <p>${group.description}</p>
             `;
-            scholarshipsContainer.appendChild(card);
-
-            setTimeout(() => {
-              card.classList.add("show");
-            }, 100 * idx);
-          });
-        }
-
-        function showSpecializations(specializations, container) {
-          if (
-            !specializations ||
-            !Array.isArray(specializations) ||
-            specializations.length === 0
-          ) {
-            container.innerHTML = "<p>No specializations data available</p>";
-            return;
-          }
-
-          const specializationsContainer = document.createElement("div");
-          specializationsContainer.className = "specializations-container";
-
-          specializations.forEach((specialization, idx) => {
-            const specializationCard = document.createElement("div");
-            specializationCard.className = "specialization-card";
-            specializationCard.innerHTML = `
-            <div style="background-color: #f0f0f0; margin-bottom: 10px;" class=" rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 p-6 hover-grow fade-in">
-              <h3 class="text-xl font-bold mb-2">
-                <i class="fas fa-fire" style="color: transparent; background-image: linear-gradient(to right, #d63230, #f39237); -webkit-background-clip: text; background-clip: text;"></i> 
-                ${specialization.name}</h3>
-              <p class="mb-2"><strong>Duration:</strong> ${
-                specialization.duration || "N/A"
-              }</p>
-              <p class="mb-2"><strong>Focus:</strong> ${
-                specialization.focus || "N/A"
-              }</p>
-            </div>
-            `;
-            specializationsContainer.appendChild(specializationCard);
-
-            setTimeout(() => {
-              specializationCard.classList.add("show");
-            }, 100 * idx);
+            groupContainer.appendChild(groupCard);
           });
 
-          container.appendChild(specializationsContainer);
-        }
-
-        function mapTagColor(text) {
-          if (!text || typeof text !== "string") {
-            return "gray";
-          }
-          switch (text.toLowerCase()) {
-            case "national":
-              return "blue";
-            case "state":
-              return "green";
-            case "university":
-              return "red";
-            case "high":
-              return "red";
-            case "medium":
-              return "green";
-            case "varies":
-              return "blue";
-            default:
-              return "gray";
-          }
+          container.appendChild(groupContainer);
         }
       });
+
+      function showJobOpportunities(jobContent, container) {
+        if (
+          !jobContent ||
+          !Array.isArray(jobContent) ||
+          jobContent.length === 0
+        ) {
+          container.innerHTML = "<p>No job opportunities data available</p>";
+          return;
+        }
+
+        const chartContainer = document.createElement("div");
+        chartContainer.className = "chart-container";
+        chartContainer.style.height = "500px";
+        chartContainer.style.width = "90%";
+        chartContainer.style.margin = "0 auto 2rem auto";
+        container.appendChild(chartContainer);
+
+        const ctx = document.createElement("canvas");
+        ctx.id = "jobOpportunitiesChart";
+        chartContainer.appendChild(ctx);
+
+        const roles = jobContent.map((job) => job.role);
+        const currentYear = new Date().getFullYear();
+        const years = [
+          currentYear - 4,
+          currentYear - 3,
+          currentYear - 2,
+          currentYear - 1,
+          currentYear,
+        ];
+
+        const growthData = jobContent.map((job) => {
+          const finalGrowth = parseFloat(job.growth.replace("%", ""));
+          return years.map((year, index) => {
+            if (index === years.length - 1) return finalGrowth;
+            return Math.max(
+              0,
+              finalGrowth - Math.random() * 5 * (years.length - index - 1)
+            );
+          });
+        });
+
+        const colorPalette = [
+          "rgba(255, 99, 132, 1)",
+          "rgba(54, 162, 235, 1)",
+          "rgba(255, 206, 86, 1)",
+          "rgba(75, 192, 192, 1)",
+          "rgba(153, 102, 255, 1)",
+          "rgba(255, 159, 64, 1)",
+        ];
+
+        const datasets = roles.map((role, index) => ({
+          label: role,
+          data: growthData[index],
+          borderColor: colorPalette[index % colorPalette.length],
+          backgroundColor: colorPalette[index % colorPalette.length].replace(
+            "1)",
+            "0.2)"
+          ),
+          borderWidth: 3,
+          pointBackgroundColor: colorPalette[index % colorPalette.length],
+          pointRadius: 5,
+          pointHoverRadius: 8,
+          fill: false,
+          tension: 0.4,
+        }));
+
+        new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: years,
+            datasets: datasets,
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                grid: {
+                  color: "rgba(0, 0, 0, 0.1)",
+                },
+                ticks: {
+                  font: {
+                    size: 12,
+                    weight: "bold",
+                  },
+                },
+              },
+              y: {
+                beginAtZero: true,
+                max: Math.max(...growthData.flat()) + 5,
+                ticks: {
+                  callback: function (value) {
+                    return value + "%";
+                  },
+                  font: {
+                    size: 12,
+                    weight: "bold",
+                  },
+                },
+                grid: {
+                  color: "rgba(0, 0, 0, 0.1)",
+                },
+              },
+            },
+            plugins: {
+              tooltip: {
+                mode: "index",
+                intersect: false,
+                backgroundColor: "rgba(0, 0, 0, 0.7)",
+                titleFont: {
+                  size: 14,
+                  weight: "bold",
+                },
+                bodyFont: {
+                  size: 13,
+                },
+                borderColor: "#fff",
+                borderWidth: 1,
+                callbacks: {
+                  label: function (context) {
+                    let label = context.dataset.label || "";
+                    if (label) {
+                      label += ": ";
+                    }
+                    if (context.parsed.y !== null) {
+                      label += context.parsed.y.toFixed(2) + "%";
+                    }
+                    return label;
+                  },
+                },
+              },
+              legend: {
+                display: true,
+                position: "bottom",
+                labels: {
+                  font: {
+                    size: 12,
+                    weight: "bold",
+                  },
+                  boxWidth: 20,
+                  padding: 20,
+                },
+              },
+              title: {
+                display: true,
+                text: "Job Growth Rate Comparison Over Years",
+                font: {
+                  size: 20,
+                  weight: "bold",
+                },
+                padding: {
+                  top: 10,
+                  bottom: 30,
+                },
+                color: "#333",
+              },
+            },
+            animation: {
+              duration: 2000,
+              easing: "easeOutQuart",
+            },
+            hover: {
+              mode: "nearest",
+              intersect: true,
+            },
+          },
+        });
+
+        setTimeout(() => {
+          chartContainer.classList.add("show");
+        }, 300);
+
+        const infoText = document.createElement("p");
+        infoText.className = "mt-4 text-center text-gray-600 text-lg";
+        infoText.textContent =
+          "The line chart above illustrates the growth trends for different job roles over the past 5 years, with the current year's growth rate matching the provided data.";
+        container.appendChild(infoText);
+
+        const table = document.createElement("table");
+        table.className = "modern-table mt-8 w-full";
+        table.innerHTML = `
+              <thead>
+                <tr>
+                  <th class="px-4 py-2">Role</th>
+                  <th class="px-4 py-2">Avg. Salary</th>
+                  <th class="px-4 py-2">Current Growth</th>
+                  <th class="px-4 py-2">Skills</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${jobContent
+                  .map(
+                    (role, index) => `
+                  <tr class="hover:bg-gray-100 transition-colors duration-200">
+                    <td class="px-4 py-2">
+                      <span class="icon mr-2" style="color: ${
+                        colorPalette[index % colorPalette.length]
+                      }">
+                        <i class="${role.icon}"></i>
+                      </span>
+                      ${role.role}
+                    </td>
+                    <td class="px-4 py-2">${role.avgSalary}</td>
+                    <td class="px-4 py-2">${role.growth}</td>
+                    <td class="px-4 py-2">${
+                      Array.isArray(role.skills)
+                        ? role.skills
+                            .map(
+                              (skill) =>
+                                `<span class="tag tag-blue">${skill}</span>`
+                            )
+                            .join(" ")
+                        : "-"
+                    }</td>
+                  </tr>
+                `
+                  )
+                  .join("")}
+              </tbody>
+            `;
+        container.appendChild(table);
+        setTimeout(() => {
+          table.classList.add("show");
+        }, 300);
+      }
+
+      function showEntranceExams(examContent, container) {
+        if (
+          !examContent ||
+          !Array.isArray(examContent) ||
+          examContent.length === 0
+        ) {
+          container.innerHTML = "<p>No entrance exam data available</p>";
+          return;
+        }
+
+        const table = document.createElement("table");
+        table.className = "modern-table";
+        table.innerHTML = `
+              <thead>
+                <tr>
+                  <th>Exam Name</th>
+                  <th>Type</th>
+                  <th>Subjects</th>
+                  <th>Difficulty</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${examContent
+                  .map(
+                    (exam) => `
+                  <tr>
+                    <td>${exam.name}</td>
+                    <td><span class="tag tag-${mapTagColor(exam.type)}">${
+                      exam.type
+                    }</span></td>
+                    <td>${exam.subjects}</td>
+                    <td><span class="tag tag-${mapTagColor(exam.difficulty)}">${
+                      exam.difficulty
+                    }</span></td>
+                  </tr>
+                `
+                  )
+                  .join("")}
+              </tbody>
+            `;
+        container.appendChild(table);
+        setTimeout(() => {
+          table.classList.add("show");
+        }, 100);
+      }
+
+      function showMasterCourses(courses, container) {
+        if (!courses || !Array.isArray(courses) || courses.length === 0) {
+          container.innerHTML = "<p>No master courses data available</p>";
+          return;
+        }
+
+        courses.forEach((course, idx) => {
+          const card = document.createElement("div");
+          card.className = "master-card";
+          card.innerHTML = `
+                <div class="master-card-content">
+                  <h3>${course.name}</h3>
+                  <p>Duration: ${course.duration}</p>
+                  <p>Focus: ${course.focus}</p>
+                </div>
+              `;
+          container.appendChild(card);
+
+          setTimeout(() => {
+            card.classList.add("show");
+          }, 100 * idx);
+        });
+      }
+
+      function showScholarships(scholarships, container) {
+        if (
+          !scholarships ||
+          !Array.isArray(scholarships) ||
+          scholarships.length === 0
+        ) {
+          container.innerHTML = "<p>No scholarship data available</p>";
+          return;
+        }
+
+        const scholarshipsContainer = document.createElement("div");
+        scholarshipsContainer.className =
+          "scholarships-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4";
+        container.appendChild(scholarshipsContainer);
+
+        scholarships.forEach((scholarship, idx) => {
+          const card = document.createElement("div");
+          card.className =
+            "scholarship-card bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 relative overflow-hidden";
+          card.innerHTML = `
+              <div class="card-content">
+                  <h3 class="text-xl font-bold mb-2">${scholarship.name}</h3>
+                  <p class="mb-2"><strong>Amount:</strong> ${scholarship.amount}</p>
+                  <p class="mb-2"><strong>Eligibility:</strong> ${scholarship.eligibility}</p>
+              </div>
+              <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-green-500 opacity-30"></div>
+          `;
+          scholarshipsContainer.appendChild(card);
+
+          setTimeout(() => {
+            card.classList.add("show");
+          }, 100 * idx);
+        });
+      }
+
+      function showSpecializations(specializations, container) {
+        if (
+          !specializations ||
+          !Array.isArray(specializations) ||
+          specializations.length === 0
+        ) {
+          container.innerHTML = "<p>No specializations data available</p>";
+          return;
+        }
+
+        const specializationsContainer = document.createElement("div");
+        specializationsContainer.className = "specializations-container";
+
+        specializations.forEach((specialization, idx) => {
+          const specializationCard = document.createElement("div");
+          specializationCard.className = "specialization-card";
+          specializationCard.innerHTML = `
+          <div style="background-color: #f0f0f0; margin-bottom: 10px;" class=" rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 p-6 hover-grow fade-in">
+            <h3 class="text-xl font-bold mb-2">
+              <i class="fas fa-fire" style="color: transparent; background-image: linear-gradient(to right, #d63230, #f39237); -webkit-background-clip: text; background-clip: text;"></i>
+              ${specialization.name}</h3>
+            <p class="mb-2"><strong>Duration:</strong> ${
+              specialization.duration || "N/A"
+            }</p>
+            <p class="mb-2"><strong>Focus:</strong> ${
+              specialization.focus || "N/A"
+            }</p>
+          </div>
+          `;
+          specializationsContainer.appendChild(specializationCard);
+
+          setTimeout(() => {
+            specializationCard.classList.add("show");
+          }, 100 * idx);
+        });
+
+        container.appendChild(specializationsContainer);
+      }
+
+      function mapTagColor(text) {
+        if (!text || typeof text !== "string") {
+          return "gray";
+        }
+        switch (text.toLowerCase()) {
+          case "national":
+            return "blue";
+          case "state":
+            return "green";
+          case "university":
+            return "red";
+          case "high":
+            return "red";
+          case "medium":
+            return "green";
+          case "varies":
+            return "blue";
+          default:
+            return "gray";
+        }
+      }
     </script>
   </body>
 </html>
